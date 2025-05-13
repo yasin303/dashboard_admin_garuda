@@ -1,24 +1,28 @@
-// src/middleware/authMiddleware.js
-const { verifyToken } = require('../utils/jwt');
+// src/middleware/authorizationMiddleware.js
+const { Role } = require('@prisma/client'); // Import enum Role jika diperlukan
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    // Bearer TOKEN_STRING
-    const token = authHeader && authHeader.split(' ')[1];
+const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        // req.admin harus sudah di-set oleh authenticateToken middleware
+        if (!req.admin || !req.admin.role) {
+            return res.status(403).json({ message: 'Akses ditolak. Peran tidak terdefinisi.' });
+        }
 
-    if (!token) {
-        return res.status(401).json({ message: 'Akses ditolak. Token tidak ditemukan.' });
-    }
+        const rolesArray = [...allowedRoles];
 
-    const decoded = verifyToken(token);
+        // Jika ADMINISTRATOR diizinkan, maka dia bisa akses apa saja yang butuh role
+        if (rolesArray.includes(Role.ADMINISTRATOR) && req.admin.role === Role.ADMINISTRATOR) {
+            return next();
+        }
 
-    if (!decoded) {
-        return res.status(403).json({ message: 'Token tidak valid atau kedaluwarsa.' });
-    }
-
-    // Simpan informasi user (misal: id admin) di request untuk digunakan controller selanjutnya
-    req.admin = decoded; // Payload token berisi data admin saat login
-    next(); // Lanjutkan ke handler rute berikutnya
+        // Periksa apakah peran pengguna ada dalam daftar peran yang diizinkan
+        if (!rolesArray.includes(req.admin.role)) {
+            return res.status(403).json({
+                message: `Akses ditolak. Peran '${req.admin.role}' tidak memiliki izin untuk sumber daya ini.`
+            });
+        }
+        next(); // Pengguna memiliki peran yang diizinkan
+    };
 };
 
-module.exports = { authenticateToken };
+module.exports = { authorizeRoles, Role }; // Ekspor juga Role agar mudah diimport di rute

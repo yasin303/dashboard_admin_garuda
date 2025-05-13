@@ -13,43 +13,35 @@ const loginAdmin = async (req, res) => {
     }
 
     try {
-        // 1. Cari admin berdasarkan email
         const admin = await prisma.admin.findUnique({
             where: { email: email },
         });
-        console.log("Admin found:", admin);
-        console.log("Password input:", password);
-        console.log("email input:", email);
-        
 
         if (!admin) {
-            return res.status(401).json({ message: 'Email atau password salah.' }); // Pesan generik
+            return res.status(401).json({ message: 'Email atau password salah.' });
         }
 
-        // 2. Bandingkan password yang diinput dengan hash di database
         const isPasswordValid = await comparePassword(password, admin.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Email atau password salah.' }); // Pesan generik
+            return res.status(401).json({ message: 'Email atau password salah.' });
         }
 
-        // 3. Jika valid, generate JWT
-        // Payload bisa berisi id, email, atau role (jika ada)
         const tokenPayload = {
             adminId: admin.id,
             email: admin.email,
-            // Tambahkan role jika perlu: role: 'admin'
+            role: admin.role, // Sertakan role di sini
         };
         const token = generateToken(tokenPayload);
 
-        // 4. Kirim token ke client
         res.status(200).json({
             message: 'Login berhasil',
             token: token,
-            admin: { // Opsional: Kirim data admin non-sensitif
+            admin: {
                 id: admin.id,
                 email: admin.email,
-                name: admin.name
+                name: admin.name,
+                role: admin.role, // Sertakan role di sini
             }
          });
 
@@ -67,10 +59,11 @@ const getAdminProfile = async (req, res) => {
     try {
         const admin = await prisma.admin.findUnique({
             where: { id: adminId },
-            select: { // Hanya pilih field yang aman untuk dikirim
+            select: {
                 id: true,
                 email: true,
                 name: true,
+                role: true, // Sertakan role
                 createdAt: true
             }
         });

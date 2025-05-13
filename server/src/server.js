@@ -11,7 +11,7 @@ const trainingRoutes = require('./routes/trainingRoutes');
 const participantRoutes = require('./routes/participantRoutes');
 
 // Middleware Autentikasi
-const { authenticateToken } = require('./middleware/authMiddleware');
+const { authorizeRoles, Role } = require('./middleware/authMiddleware');
 
 const prisma = new PrismaClient();
 const app = express();
@@ -32,9 +32,9 @@ app.use((req, res, next) => {
 app.use('/api/v1/auth', authRoutes);
 
 // Rute Terproteksi (Memerlukan token JWT)
-// Semua rute di bawah ini akan dicek oleh authenticateToken
-app.use('/api/v1/trainings', authenticateToken, trainingRoutes);
-app.use('/api/v1/participants', authenticateToken, participantRoutes);
+// Semua rute di bawah ini akan dicek oleh authorizeRoles
+app.use('/api/v1/trainings', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES, Role.FINANCE), trainingRoutes);
+app.use('/api/v1/participants', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES, Role.FINANCE), participantRoutes);
 
 // Rute Dasar
 app.get('/', (req, res) => {

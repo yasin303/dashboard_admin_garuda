@@ -7,13 +7,23 @@ const {
     updateParticipant,
     deleteParticipant
 } = require('../controllers/participantController');
+const { authorizeRoles, Role } = require('../middleware/authMiddleware'); // Import
 
 const router = express.Router();
 
-router.get('/', getAllParticipants);         // GET /api/v1/participants
-router.post('/', createParticipant);        // POST /api/v1/participants
-router.get('/:id', getParticipantById);    // GET /api/v1/participants/:id
-router.put('/:id', updateParticipant);     // PUT /api/v1/participants/:id
-router.delete('/:id', deleteParticipant);  // DELETE /api/v1/participants/:id
+// Yang bisa melihat semua peserta: ADMINISTRATOR, ADMIN, SALES, FINANCE
+router.get('/', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES, Role.FINANCE), getAllParticipants);
+router.get('/:id', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES, Role.FINANCE), getParticipantById);
+
+// Yang bisa membuat peserta: ADMINISTRATOR, ADMIN, SALES (misalnya untuk mendaftarkan)
+router.post('/', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES), createParticipant);
+
+// Yang bisa update data peserta (misal, status dokumen oleh ADMIN, status pembayaran oleh FINANCE)
+// Ini bisa jadi lebih granular, misal field tertentu hanya bisa diupdate oleh role tertentu.
+// Untuk sekarang, kita buat ADMINISTRATOR, ADMIN, FINANCE bisa update.
+router.put('/:id', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.FINANCE), updateParticipant);
+
+// Yang bisa menghapus peserta: ADMINISTRATOR, ADMIN
+router.delete('/:id', authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN), deleteParticipant);
 
 module.exports = router;
