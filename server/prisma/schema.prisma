@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   // Akan di-hash menggunakan bcrypt
+  name      String?  // Nama admin (opsional)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Model untuk Pelatihan
+model Training {
+  id          Int           @id @default(autoincrement())
+  name        String        @map("nama_pelatihan") // Sesuaikan nama kolom jika perlu
+  category    String        @map("kategori")
+  startDate   DateTime      @map("periode_mulai")
+  endDate     DateTime      @map("periode_selesai")
+  batch       Int
+  status      TrainingStatus @default(PLANNED) // Menggunakan Enum untuk status
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  participants Participant[] // Relasi one-to-many ke Peserta
+}
+
+// Model untuk Peserta
+model Participant {
+  id             Int            @id @default(autoincrement())
+  registrationId String?        @unique @map("nomor_registrasi") // Contoh: DATA/CSI/1/2025 (opsional, bisa digenerate di backend)
+  name           String         @map("nama_peserta")
+  notes          String?
+  paymentStatus  PaymentStatus  @map("status_pembayaran")
+  documentStatus DocumentStatus @map("status_dokumen")
+  sales          String?        // Nama sales
+  trainingId     Int            @map("pelatihan_id")
+  training       Training       @relation(fields: [trainingId], references: [id], onDelete: Cascade) // Relasi many-to-one ke Pelatihan
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+// Enum untuk Status Pelatihan
+enum TrainingStatus {
+  PLANNED    // Baru direncanakan
+  RUNNING    // Sedang berjalan
+  CHECKING   // Proses pengecekan/verifikasi
+  RESCHEDULE // Dijadwalkan ulang
+  COMPLETED  // Selesai
+  CANCELED   // Dibatalkan
+}
+
+// Enum untuk Status Pembayaran Peserta
+enum PaymentStatus {
+  PENDING // Belum bayar / Menunggu
+  DP      // Sudah DP
+  WARM    // Istilah internal? Mungkin sama dengan DP atau cicilan?
+  LUNAS   // Lunas
+}
+
+// Enum untuk Status Dokumen Peserta
+enum DocumentStatus {
+  PENDING // Belum ada / Menunggu
+  INPUT   // Sudah diinput/upload
+  CLAIM   // Diklaim/Diproses
+  VERIFIED // Terverifikasi
+  REJECTED // Ditolak
+  BELUM    // Belum lengkap (sesuai gambar)
+}
