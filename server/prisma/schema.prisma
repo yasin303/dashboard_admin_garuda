@@ -35,6 +35,7 @@ model Training {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   participants Participant[]
+  transactions Transaction[]  
 }
 
 model Participant {
@@ -47,8 +48,34 @@ model Participant {
   sales          String?
   trainingId     Int            @map("pelatihan_id")
   training       Training       @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  transactions   Transaction[]  
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+}
+
+model Transaction {
+  id             Int            @id @default(autoincrement())
+  code           String         @unique @map("kode_transaksi")
+  participantId  Int            @map("peserta_id")
+  participant    Participant    @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  trainingId     Int            @map("pelatihan_id")
+  training       Training       @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  method         PaymentMethod  @map("metode_pembayaran")
+  amount         Decimal        @map("jumlah_pembayaran")
+  status         PaymentStatus  @map("status_pembayaran") 
+  proofUrl       String?        @map("bukti_pembayaran")  
+  notes          String?        @map("keterangan")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+enum PaymentMethod {
+  TRANSFER
+  QRIS
+  CASH
+  VIRTUAL_ACCOUNT
+  CREDIT_CARD
+  OTHER
 }
 
 enum TrainingStatus {
