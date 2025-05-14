@@ -1,5 +1,5 @@
 // prisma/seed.js
-const { PrismaClient, Role } = require('@prisma/client'); // Import Role
+const { PrismaClient, Role } = require('@prisma/client'); 
 const { hashPassword } = require('../src/utils/password');
 
 const prisma = new PrismaClient();
@@ -36,7 +36,6 @@ async function main() {
 
     for (const userData of usersToSeed) {
         const hashedPassword = await hashPassword(userData.password);
-        // Hapus user lama jika ada (untuk idempotency)
         await prisma.admin.deleteMany({ where: { email: userData.email } });
 
         const admin = await prisma.admin.create({
@@ -49,9 +48,6 @@ async function main() {
         });
         console.log(`Created admin user: ${admin.email} with role: ${admin.role}`);
     }
-
-    // Anda bisa menambahkan data seed lain di sini (misal: contoh pelatihan)
-    // ...
 
     console.log('Seeding finished.');
 }

@@ -16,7 +16,7 @@ const Sidebar = () => {
     const pathname = usePathname();
 
     return (
-        <aside style={{ width: '250px', backgroundColor: '#1e3a8a', color: 'white', padding: '20px', height: '100vh', position: 'fixed', left: '0', top: '0', display: 'flex', flexDirection: 'column' /* className={styles.sidebar} */ }}>
+        <aside style={{ width: '250px', backgroundColor: '#ffffff', color: 'black', padding: '20px', height: '100vh', position: 'fixed', left: '0', top: '0', display: 'flex', flexDirection: 'column' /* className={styles.sidebar} */ }}>
             <div style={{ marginBottom: '30px', textAlign: 'center' /* className={styles.logo} */ }}>
                 <img src="/garuda-logo.png" alt="Garuda QHSE" width={150} />
             </div>

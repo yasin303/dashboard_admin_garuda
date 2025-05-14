@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,26 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enum untuk Peran Admin
 enum Role {
-  ADMINISTRATOR // Dapat mengakses dan mengelola semua fitur
-  ADMIN         // Dapat mengakses dan mengelola pelatihan, peserta dan sertifikat
-  FINANCE       // Dapat mengakses dan mengelola pembayaran, invoice dan kuitansi
-  SALES         // Dapat mengakses dan mengelola data peserta, pelatihan, kuota pelatihan, pendapatan bulanan
+  ADMINISTRATOR 
+  ADMIN         
+  FINANCE       
+  SALES         
 }
 
-// Model untuk Admin/User
 model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   name      String?
-  role      Role     @default(ADMIN) // Tambahkan field role, default ke ADMIN
+  role      Role     @default(ADMIN) 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// Model untuk Pelatihan
 model Training {
   id           Int            @id @default(autoincrement())
   name         String         @map("nama_pelatihan")
@@ -43,7 +37,6 @@ model Training {
   participants Participant[]
 }
 
-// Model untuk Peserta
 model Participant {
   id             Int            @id @default(autoincrement())
   registrationId String?        @unique @map("nomor_registrasi")
@@ -58,7 +51,6 @@ model Participant {
   updatedAt      DateTime       @updatedAt
 }
 
-// Enum untuk Status Pelatihan
 enum TrainingStatus {
   PLANNED
   RUNNING
@@ -68,7 +60,6 @@ enum TrainingStatus {
   CANCELED
 }
 
-// Enum untuk Status Pembayaran Peserta
 enum PaymentStatus {
   PENDING
   DP
@@ -76,7 +67,6 @@ enum PaymentStatus {
   LUNAS
 }
 
-// Enum untuk Status Dokumen Peserta
 enum DocumentStatus {
   PENDING
   INPUT
