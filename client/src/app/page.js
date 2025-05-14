@@ -1,23 +1,17 @@
 // src/app/page.js
-'use client'; // Karena menggunakan hooks
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../context/AuthContext'; // Sesuaikan path
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getToken } from "../../src/lib/api"; 
 
 export default function HomePage() {
-    const router = useRouter();
-    const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (!loading) {
-            if (isAuthenticated) {
-                router.replace('/admin/pelatihan'); // Atau /admin/dashboard
-            } else {
-                router.replace('/login');
-            }
-        }
-    }, [isAuthenticated, loading, router]);
-
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      {loading && <p className="text-gray-600 text-lg">Loading...</p>}
+    </div>
+  );
 }

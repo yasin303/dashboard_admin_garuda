@@ -1,7 +1,7 @@
 // src/components/Header.js
 'use client';
-import { useAuth } from '../context/AuthContext'; // Sesuaikan path
-// import styles from './Header.module.css'; // Buat CSS Module
+import { useAuth } from '../context/AuthContext'; 
+// import styles from './Header.module.css'; 
 
 const Header = () => {
     const { user, logout } = useAuth();

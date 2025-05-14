@@ -1,6 +1,6 @@
 // src/app/layout.js
-import { AuthProvider } from '../context/AuthContext'; // Sesuaikan path
-import './globals.css'; // Import global styles
+import { AuthProvider } from '../context/AuthContext'; 
+import './globals.css'; 
 
 export const metadata = {
   title: 'Garuda QHSE Institution',

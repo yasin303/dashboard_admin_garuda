@@ -1,56 +1,185 @@
 // src/lib/api.js
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api/v1";
 
+// Token management
+export const setToken = (token) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", token);
+    }
+};
+  
+export const getToken = () => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("token");
+    }
+    return null;
+};
+  
+export const removeToken = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+    }
+};
+
+// Axios instance, Api instance
 const axiosInstance = axios.create({
     baseURL: API_URL,
     headers: {
-        "Content-Type": "application/json",
-      },
+      "Content-Type": "application/json",
+    },
 });
-
-// Interceptor untuk menambahkan token ke setiap request jika ada
+  
+// request add token
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = Cookies.get('token');
-        if (token && !config.headers['Authorization']) { // Hanya set jika belum ada
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
+      const token = getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
     },
     (error) => {
-        return Promise.reject(error);
+      return Promise.reject(error);
     }
 );
-
-// Interceptor untuk menangani error global (misal, 401 Unauthorized)
+  
+// response handle errors
 axiosInstance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      return response;
+    },
     (error) => {
-        if (error.response && error.response.status === 401) {
-            Cookies.remove('token');
-            // Di App Router, penanganan redirect lebih baik dilakukan di layout atau middleware
-            // Untuk sementara, kita bisa log atau melempar error agar ditangani di komponen
-            console.warn("Token expired or invalid. User should be redirected.");
-            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-                 // window.location.href = '/login'; // Hindari hard redirect jika bisa
-            }
-        }
-        return Promise.reject(error);
+      if (error.response.status === 401) {
+        removeToken();
+        window.location.href = "/admin"; // Redirect to login page
+      }
+      return Promise.reject(error);
     }
 );
+  
+export default axiosInstance;
 
-// Pelatihan
-export const getTrainings = (params = {}) => axiosInstance.get('/trainings', { params });
-export const getTrainingById = (id) => axiosInstance.get(`/trainings/${id}`);
-export const createTraining = (data) => axiosInstance.post('/trainings', data);
-export const updateTraining = (id, data) => axiosInstance.put(`/trainings/${id}`, data);
-export const deleteTraining = (id) => axiosInstance.delete(`/trainings/${id}`);
+// API calls
+export const login = async (credentials) => {
+    try {
+      const res = await axiosInstance.post("/auth/login", credentials);
+  
+      console.log("Response data:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Error logging in:", error);
+      throw error;
+    }
+};
 
-// Peserta
-export const getParticipants = (params = {}) => axiosInstance.get('/participants', { params });
-// ... (fungsi API lainnya)
+export const getProfile = async () => {
+    try {
+        const res = await axiosInstance.get('/auth/profile');
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching profile:", error);
+        throw error;
+    }
+};
 
-export default axiosInstance; // Ekspor instance-nya
+export const getTrainings = async (params = {}) => {
+    try {
+        const res = await axiosInstance.get('/trainings', { params });
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching trainings:", error);
+        throw error;
+    }
+};
+
+export const getTrainingById = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/trainings/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching training by ID:", error);
+        throw error;
+    }
+};
+
+export const createTraining = async (data) => {
+    try {
+        const res = await axiosInstance.post('/trainings', data);
+        return res.data;
+    } catch (error) {
+        console.error("Error creating training:", error);
+        throw error;
+    }
+};
+
+export const updateTraining = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(`/trainings/${id}`, data);
+        return res.data;
+    } catch (error) {
+        console.error("Error updating training:", error);
+        throw error;
+    }
+};
+
+export const deleteTraining = async (id) => {
+    try {
+        const res = await axiosInstance.delete(`/trainings/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error("Error deleting training:", error);
+        throw error;
+    }
+};
+
+export const getParticipants = async (params = {}) => {
+    try {
+        const res = await axiosInstance.get('/participants', { params });
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching participants:", error);
+        throw error;
+    }
+};
+
+export const getParticipantById = async (id) => {
+    try {
+        const res = await axiosInstance.get(`/participants/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching participant by ID:", error);
+        throw error;
+    }
+};
+
+export const createParticipant = async (data) => {
+    try {
+        const res = await axiosInstance.post('/participants', data);
+        return res.data;
+    } catch (error) {
+        console.error("Error creating participant:", error);
+        throw error;
+    }
+};
+
+export const updateParticipant = async (id, data) => {
+    try {
+        const res = await axiosInstance.put(`/participants/${id}`, data);
+        return res.data;
+    } catch (error) {
+        console.error("Error updating participant:", error);
+        throw error;
+    }
+};
+
+export const deleteParticipant = async (id) => {
+    try {
+        const res = await axiosInstance.delete(`/participants/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error("Error deleting participant:", error);
+        throw error;
+    }
+};

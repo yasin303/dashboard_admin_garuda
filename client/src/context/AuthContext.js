@@ -1,15 +1,14 @@
 // src/context/AuthContext.js
-'use client'; // Penting! Tandai sebagai Client Component
+'use client'; 
 
-import { createContext, useState, useEffect, useContext } // Tambahkan useContext
+import { createContext, useState, useEffect, useContext } 
 from 'react';
 import Cookies from 'js-cookie';
-import axiosInstance from '../lib/api'; // Menggunakan instance axios dari api.js
-import { useRouter, usePathname } from 'next/navigation'; // Gunakan dari next/navigation
+import axiosInstance from '../lib/api'; 
+import { useRouter, usePathname } from 'next/navigation'; 
 
 const AuthContext = createContext();
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL; // Untuk URL profil
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -18,39 +17,37 @@ export const AuthProvider = ({ children }) => {
     const router = useRouter();
     const pathname = usePathname();
 
-    useEffect(() => {
-        const loadUserFromCookies = async () => {
-            const token = Cookies.get('token');
-            if (token) {
-                // Set token default untuk axiosInstance dari awal
-                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                try {
-                    const { data } = await axiosInstance.get(`/auth/profile`); // Path relatif ke base URL
-                    setUser(data);
-                } catch (err) {
-                    Cookies.remove('token');
-                    delete axiosInstance.defaults.headers.common['Authorization'];
-                    setUser(null);
-                    // Redirect jika tidak di halaman login dan token tidak valid
-                    if (pathname !== '/login') {
-                        // router.push('/login'); // Dikelola oleh AdminLayout
-                    }
-                }
-            }
-            setLoading(false);
-        };
-        loadUserFromCookies();
-    }, [pathname]); // Perhatikan dependency array
+    // useEffect(() => {
+    //     // const loadUserFromCookies = async () => {
+    //     //     const token = Cookies.get('token');
+    //     //     if (token) {         
+    //     //         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    //     //         try {
+    //     //             const { data } = await axiosInstance.get(`/auth/profile`); 
+    //     //             setUser(data);
+    //     //         } catch (err) {
+    //     //             Cookies.remove('token');
+    //     //             delete axiosInstance.defaults.headers.common['Authorization'];
+    //     //             setUser(null);
+
+    //     //             if (pathname !== '/login') {
+    //     //                 // router.push('/login'); // Dikelola oleh AdminLayout
+    //     //             }
+    //     //         }
+    //     //     }
+    //     //     setLoading(false);
+    //     // };
+    //     // loadUserFromCookies();
+    // }, [pathname]); 
 
     const login = async (email, password) => {
         setError(null);
         try {
-            // Pastikan API_BASE_URL sudah benar di .env.local
             const { data } = await axiosInstance.post(`/auth/login`, { email, password });
             Cookies.set('token', data.token, { expires: 1 });
             axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
             setUser(data.admin);
-            router.push('/admin/dashboard'); // Atau /admin/dashboard
+            router.push('/admin/dashboard'); 
             return true;
         } catch (err) {
             const message = err.response?.data?.message || 'Login gagal. Silakan coba lagi.';
@@ -75,5 +72,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Custom hook untuk menggunakan AuthContext
 export const useAuth = () => useContext(AuthContext);

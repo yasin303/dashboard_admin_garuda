@@ -2,14 +2,14 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 // import styles from './Sidebar.module.css'; // Buat CSS Module
 
 const menuItems = [
-    // Sesuaikan rute dengan struktur App Router Anda
     { href: '/admin/dashboard', label: 'Dashboard' },
-    { href: '/admin/peserta', label: 'Peserta' },
-    { href: '/admin/pelatihan', label: 'Pelatihan' },
-    { href: '/admin/transaksi', label: 'Transaksi' },
+    { href: '/admin/participants', label: 'Peserta' },
+    { href: '/admin/trainings', label: 'Pelatihan' },
+    { href: '/admin/transaction', label: 'Transaksi' },
 ];
 
 const Sidebar = () => {
@@ -18,7 +18,7 @@ const Sidebar = () => {
     return (
         <aside style={{ width: '250px', backgroundColor: '#ffffff', color: 'black', padding: '20px', height: '100vh', position: 'fixed', left: '0', top: '0', display: 'flex', flexDirection: 'column' /* className={styles.sidebar} */ }}>
             <div style={{ marginBottom: '30px', textAlign: 'center' /* className={styles.logo} */ }}>
-                <img src="/garuda-logo.png" alt="Garuda QHSE" width={150} />
+                <Image src="/garuda-logo.png" alt="Garuda QHSE" width={150} height={100} />
             </div>
             <nav>
                 <ul style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
