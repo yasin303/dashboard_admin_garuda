@@ -8,6 +8,7 @@ const { PrismaClient } = require('@prisma/client');
 const authRoutes = require('./routes/authRoutes');
 const trainingRoutes = require('./routes/trainingRoutes');
 const participantRoutes = require('./routes/participantRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
 
 const { authenticateToken, authorizeRoles, Role } = require('./middleware/authMiddleware');
 
@@ -33,6 +34,10 @@ app.use('/api/v1/trainings', authenticateToken,
 app.use('/api/v1/participants', authenticateToken,
     authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES, Role.FINANCE),
     participantRoutes);
+
+app.use('/api/v1/transactions', authenticateToken,
+    authorizeRoles(Role.ADMINISTRATOR, Role.ADMIN, Role.SALES, Role.FINANCE),
+    transactionRoutes);
 
 app.get('/', (req, res) => {
     res.send('Selamat Datang di API Training Management!');
