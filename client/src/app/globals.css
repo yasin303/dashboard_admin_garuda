@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.active-link-class a { /* Atau style langsung pada li jika lebih baik */
+  background-color: #2563eb;
+  color: white !important; /* Hati-hati dengan !important */
+  font-weight: bold;
+}
+/* Arahkan style hover pada Link atau <li> nya */
+nav ul li a:hover {
+  background-color: #2563eb;
+  color: white;
+}
