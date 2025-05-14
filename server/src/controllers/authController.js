@@ -30,7 +30,7 @@ const loginAdmin = async (req, res) => {
         const tokenPayload = {
             adminId: admin.id,
             email: admin.email,
-            role: admin.role, // Sertakan role di sini
+            role: admin.role, 
         };
         const token = generateToken(tokenPayload);
 
@@ -41,7 +41,7 @@ const loginAdmin = async (req, res) => {
                 id: admin.id,
                 email: admin.email,
                 name: admin.name,
-                role: admin.role, // Sertakan role di sini
+                role: admin.role, 
             }
          });
 
@@ -51,9 +51,7 @@ const loginAdmin = async (req, res) => {
     }
 };
 
-// Opsional: Fungsi untuk mendapatkan profil admin yang sedang login (berdasarkan token)
-const getAdminProfile = async (req, res) => {
-    // Informasi admin sudah ada di req.admin dari middleware authenticateToken
+const getAdminProfile = async (req, res) => {    
     const adminId = req.admin.adminId;
 
     try {
@@ -63,7 +61,7 @@ const getAdminProfile = async (req, res) => {
                 id: true,
                 email: true,
                 name: true,
-                role: true, // Sertakan role
+                role: true, 
                 createdAt: true
             }
         });
@@ -77,6 +75,5 @@ const getAdminProfile = async (req, res) => {
         res.status(500).json({ message: 'Gagal mengambil profil admin.' });
     }
 }
-
 
 module.exports = { loginAdmin, getAdminProfile };

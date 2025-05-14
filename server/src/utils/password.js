@@ -1,6 +1,6 @@
 // src/utils/password.js
 const bcrypt = require('bcrypt');
-const saltRounds = 10; // Tingkat kompleksitas hash
+const saltRounds = 10; 
 
 const hashPassword = async (password) => {
     return await bcrypt.hash(password, saltRounds);
